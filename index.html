@@ -32,42 +32,27 @@ footer{background:var(--navy);color:#fff;padding:22px 20px}.foot{max-width:1180p
 <section class="hero"><div class="hero-inner">
   <span class="eyebrow">DIREKTORAT INFORMASI &amp; EDUKASI BNN</span>
   <h2>Sistem Monitoring Pelaksanaan Informasi &amp; Edukasi Tahun Anggaran 2026</h2>
-  <p>Portal monitoring untuk pemantauan Satker, evaluasi pelaksanaan, analisis, rekomendasi, dan dukungan pengambilan keputusan pimpinan.</p>
+  <p>Portal Monitoring IE 2026 untuk pemantauan, analisis, rekomendasi, dan laporan pimpinan.</p>
 </div></section>
 <main>
 <section class="portal">
-  <h3>Akses Sistem</h3>
-  <p class="lead">Pilih salah satu akses berikut untuk melanjutkan.</p>
+  <h3>Akses Monitoring</h3>
+  <p class="lead">Satu pintu untuk Monitoring IE 2026 dan Laporan Pimpinan.</p>
   <div class="grid">
-    <button class="card" onclick="location.href='evaluasi.html'" aria-label="Masuk Sistem">
-      <div class="icon">🔐</div><h4>Masuk Sistem</h4><p>Akses ruang Monitoring &amp; Evaluasi Dit IE untuk personel yang memiliki kunci akses.</p><span class="arrow">Masuk →</span>
-    </button>
-    <button class="card form" onclick="openFormModal()" aria-label="Form Satker">
-      <div class="icon">📝</div><h4>Form Satker</h4><p>Isi Form Monitoring Satker atau bagikan tautan formulir kepada Satker.</p><span class="arrow">Buka / Bagikan →</span>
+    <button class="card" onclick="location.href='evaluasi.html'" aria-label="Masuk Sistem Monitoring">
+      <div class="icon">📊</div><h4>Masuk Sistem Monitoring</h4>
+      <p>Akses ruang Monitoring IE 2026 untuk melihat GIS, kondisi nasional, BNNP/BNNK, analisis, rekomendasi, dan Laporan Pimpinan.</p>
+      <span class="arrow">Buka Monitoring →</span>
     </button>
   </div>
   <div class="info">
-    <div class="info-box"><b>Untuk Personel Dit IE</b><br>Gunakan <b>Masuk Sistem</b> untuk memantau data, melihat GIS, melakukan evaluasi, dan menghasilkan rekomendasi.</div>
+    <div class="info-box"><b>Ruang Pimpinan &amp; Monitoring</b><br>Seluruh keluaran monitoring, analisis, rekomendasi, rekap BNNP/BNNK, dan pencetakan laporan tersedia dalam satu ruang sistem.</div>
+  </div>
     <div class="info-box"><b>Untuk Satker</b><br>Gunakan <b>Form Satker</b> untuk membuka formulir pengisian tanpa harus masuk ke ruang evaluasi.</div>
   </div>
 </section>
 </main>
 <footer><div class="foot"><img src="assets/logo-bnn.webp" alt="BNN"><div><strong>Direktorat Informasi &amp; Edukasi BNN</strong><span>Sistem Monitoring Pelaksanaan Informasi &amp; Edukasi · 2026</span></div></div></footer>
-<div id="formModal" class="modal" onclick="if(event.target===this)closeFormModal()"><div class="dialog" role="dialog" aria-modal="true" aria-labelledby="formTitle">
-  <div class="dialog-head"><div><h3 id="formTitle">Form Monitoring Satker</h3><p class="small">Tautan resmi formulir pengisian.</p></div><button class="close" onclick="closeFormModal()" aria-label="Tutup">×</button></div>
-  <div class="linkbox" id="formLink">https://form-satker.dit-ie.my.id</div>
-  <div class="actions"><button class="btn primary" onclick="openForm()">📝 Buka Form</button><button class="btn secondary" onclick="copyFormLink()">📋 Salin Link</button><button class="btn secondary full" onclick="shareForm()">🔗 Bagikan Link Form</button></div>
-  <div id="shareMsg" class="small" aria-live="polite"></div>
-</div></div>
-<script>
-const FORM_URL='https://form-satker.dit-ie.my.id';
-function openFormModal(){document.getElementById('formModal').classList.add('show');document.body.style.overflow='hidden'}
-function closeFormModal(){document.getElementById('formModal').classList.remove('show');document.body.style.overflow=''}
-function openForm(){window.open(FORM_URL,'_blank','noopener,noreferrer')}
-async function copyFormLink(){try{await navigator.clipboard.writeText(FORM_URL);document.getElementById('shareMsg').textContent='Link berhasil disalin.'}catch(e){document.getElementById('shareMsg').textContent='Salin link berikut secara manual: '+FORM_URL}}
-async function shareForm(){const text='Form Monitoring Pelaksanaan Informasi & Edukasi Dit IE 2026';if(navigator.share){try{await navigator.share({title:text,text:text,url:FORM_URL});document.getElementById('shareMsg').textContent='Link siap dibagikan.'}catch(e){}}else{await copyFormLink()}}
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeFormModal()});
-if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(e=>console.warn('PWA service worker:',e)))}
-</script>
+
 </body>
 </html>

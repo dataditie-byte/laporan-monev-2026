@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="app-version" content="Sistem Monitoring IE 2026 FINAL">
+<meta name="app-version" content="Sistem Monitoring IE 2026 V1.0.7">
 <meta name="theme-color" content="#0b376a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -131,30 +131,12 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:10px;bor
 <div class="toolbar" style="justify-content:space-between"><div><h2 id="detailTitle" style="margin:0 0 4px"></h2><div id="detailMeta" class="muted"></div></div><div style="display:flex;gap:8px;align-items:center"><button id="detailWord" class="btn">📄 Laporan Word</button><button id="closeDetail" class="btn secondary">Tutup</button></div></div>
 <div id="detailData" style="margin-top:15px"></div>
 <div class="detail-note">Analisis dan rekomendasi pada Satker ini disusun dari data monitoring yang tersedia dan ketentuan Juknis.</div>
-
-<div id="finalReportTools" class="panel" style="margin-top:16px">
-  <h3 style="margin-top:0">Laporan Monev 2026 — Final</h3>
-  <p class="muted small">Laporan menggunakan data dan evidence mesin. Tidak membuat skor atau peringkat baru.</p>
-  <div class="toolbar">
-    <button class="btn secondary" onclick="MonevFinalReports.open('SATKER',false)">Laporan Satker</button>
-    <button class="btn secondary" onclick="MonevFinalReports.open('BNNP',false)">Rekap BNNP / Provinsi</button>
-    <button class="btn secondary" onclick="MonevFinalReports.open('NATIONAL',false)">Laporan Direktorat / Nasional</button>
-    <button class="btn secondary" onclick="MonevFinalReports.open('NATIONAL',true)">Cetak Nasional</button>
-  </div>
-</div>
 </section>
 </section>
 </main>
 <footer class="footer"><div class="footer-inner"><img class="footer-logo" src="assets/logo-bnn.webp"><div><strong>Direktorat Informasi &amp; Edukasi BNN</strong><br>Monitoring IE 2026</div></div></footer>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-<script>
-/* AI integration contract — provider endpoint is intentionally external. */
-window.MONEV_AI_CONFIG = window.MONEV_AI_CONFIG || {};
-</script>
-<script src="ai_analysis_engine.js"></script>
-
-<script src="app_final.js?v=FINAL"></script>
+<script src="app_final.js?v=1.0.7"></script>
 <script>if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(e=>console.warn("PWA service worker:",e)));}</script>
-</body>
+<script src="app_final.js"></script><script src="laporan_pimpinan.js"></script></body>
 </html>

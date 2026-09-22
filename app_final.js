@@ -678,26 +678,7 @@ function _filledRatio(obj){
 }
 function _negativeKeys(obj,keys){return keys.filter(k=>_hasVal(obj?.[k])&&_negative(obj[k]));}
 function _firstText(obj,keys){for(const k of keys){if(_hasVal(obj?.[k]))return String(obj[k]).trim()}return'';}
-function _num(v){
-  if(v===null||v===undefined||String(v).trim()==='') return null;
-  if(typeof v==='number') return Number.isFinite(v)?v:null;
-  let s=String(v).trim().replace(/[^0-9,.\-]/g,'');
-  if(!s) return null;
-  const comma=s.lastIndexOf(','), dot=s.lastIndexOf('.');
-  if(comma>=0 && dot>=0){
-    if(comma>dot) s=s.replace(/\./g,'').replace(',','.');
-    else s=s.replace(/,/g,'');
-  }else if(comma>=0){
-    const parts=s.split(',');
-    s=(parts.length===2 && parts[1].length<=2)?s.replace(',','.'):s.replace(/,/g,'');
-  }else if(dot>=0){
-    const parts=s.split('.');
-    if(parts.length>2) s=s.replace(/\./g,'');
-    else if(parts.length===2 && parts[1].length===3) s=s.replace(/\./g,'');
-  }
-  const n=Number(s);
-  return Number.isFinite(n)?n:null;
-}
+function _num(v){const n=Number(String(v??'').replace(/[^0-9.,-]/g,'').replace(/\.(?=\d{3}(?:\D|$))/g,'').replace(',','.'));return Number.isFinite(n)?n:null;}
 function _patternForSection(code,st,obj,exists,negativeCount,filledRatio){
   if(!exists) return {id:15,name:NARRATIVE_PATTERNS[15],reason:'data tidak tersedia'};
   if(st==='MEMENUHI'){
@@ -806,7 +787,7 @@ function _evidenceFacts(r,code){
     const mediaActs=_num(obj.c03a), mediaReach=_num(obj.c03b);
     const contents=_num(obj.c04a), reach=_num(obj.c04d);
     if(faceTarget!==null && facePresent!==null){
-      const pct=faceTarget>0?(facePresent/faceTarget)*100:null;
+      const pct=(facePresent/faceTarget)*100;
       facts.push(`Kegiatan tatap muka mencatat ${num(facePresent)} peserta hadir dari target ${num(faceTarget)} (${pct.toFixed(1).replace('.',',')}%).`);
       const tr=_trendSentence('Peserta hadir tatap muka',facePresent,_num(po.c01c));
       if(tr) facts.push(tr);
@@ -954,25 +935,33 @@ function renderAnalysisSelector(){
 }
 
 function comparisonForSelected(ids){
+  // FINAL: no ranking/score/comparative winner is used.
   return ids.map(pid=>{
     const r=(data?.records||[]).find(x=>String(x.pengisian_id)===String(pid));
     if(!r)return null;
-    const parts=[r.saved?.A,r.saved?.B,r.saved?.C].filter(Boolean).length;
     const items=(analyses||[]).filter(a=>String(a.pengisian_id)===String(pid));
-    const high=items.filter(a=>['TINGGI','ATENSI'].includes(String(a.prioritas||a.priority||'').toUpperCase())).length;
-    const med=items.filter(a=>['SEDANG','PENDAMPINGAN','MONITORING'].includes(String(a.prioritas||a.priority||'').toUpperCase())).length;
-    const complete=String(r.status||'').toUpperCase()==='SELESAI';
-    return {r,parts,high,med,complete,items};
+    return {r,items};
   }).filter(Boolean);
 }
 function renderComparison(ids){
   const box=$('analysisComparison');if(!box)return;
   const rows=comparisonForSelected(ids);
   if(rows.length<2){box.innerHTML='';return}
-  box.innerHTML=`<div class="comparison-head"><h3>Perbandingan Kondisi Monitoring</h3>
-    <p class="small muted">Perbandingan ini hanya menampilkan kondisi data monitoring yang tersedia. Sistem tidak membuat skor, peringkat, atau penilaian relatif antar-Satker.</p></div>
-    <table><tr><th>Satker</th><th>Status</th><th>Bagian tersedia</th><th>Atensi</th><th>Pendampingan</th></tr>
-    ${rows.map(x=>`<tr><td>${esc(x.r.nama_satker||'—')}</td><td>${esc(displayStatus(x.r.status))}</td><td>${x.parts}/3</td><td>${x.high}</td><td>${x.med}</td></tr>`).join('')}</table>`;
+  box.innerHTML=`<div class="comparison-head">
+    <h3>Ringkasan Satker Terpilih</h3>
+    <p class="small muted">Tampilan ini hanya menyajikan data dan hasil telaah masing-masing Satker. Tidak ada skor atau peringkat antar-Satker.</p>
+  </div>
+  <div class="comparison-table-wrap"><table class="comparison-table">
+    <thead><tr><th>Satker</th><th>Status</th><th>Bagian tersedia</th><th>Perlu perhatian</th><th>Perlu pendampingan</th></tr></thead>
+    <tbody>
+    ${rows.map(x=>{
+      const parts=[x.r.saved?.A,x.r.saved?.B,x.r.saved?.C].filter(Boolean).length;
+      const high=x.items.filter(a=>['TINGGI','ATENSI'].includes(String(a.prioritas||a.priority||'').toUpperCase())).length;
+      const med=x.items.filter(a=>['SEDANG','PENDAMPINGAN','MONITORING'].includes(String(a.prioritas||a.priority||'').toUpperCase())).length;
+      return `<tr><td><b>${esc(x.r.nama_satker||'—')}</b><br><span class="small muted">${esc(x.r.kode_satker||'')}</span></td>
+      <td>${esc(displayStatus(x.r.status))}</td><td>${parts}</td><td>${high}</td><td>${med}</td></tr>`;
+    }).join('')}
+    </tbody></table></div>`;
 }
 function renderAnalysis(){
   renderAnalysisSelector();
@@ -1043,7 +1032,11 @@ function makeReportHtml(records,items,title,comparison){
     <h3>Analisis &amp; Rekomendasi</h3>${reportAnalysisRows(finalAnalysesForRecord(r))}
     <div class="analysis-box"><h3>Atensi / Prioritas Pimpinan</h3><p>${esc(finalOverallRecommendation(r))}</p></div>
   </section>`).join('');
-  const cmp='';
+  const cmp=comparison&&comparison.length>1?`
+  <h2>Perbandingan Antar-Satker</h2>
+  <p class="small">Perbandingan ini menunjukkan kondisi monitoring yang relatif lebih baik berdasarkan kelengkapan data dan hasil telaah yang tersedia. Ini bukan nilai kinerja baru dan tidak menggantikan penilaian Juknis.</p>
+  <table><tr><th>Peringkat</th><th>Satker</th><th>Status</th><th>Bagian tersedia</th><th>Perlu perhatian</th><th>Perlu pendampingan</th><th>Kesimpulan relatif</th></tr>
+  ${comparison.map((x,i)=>`<tr><td>${i+1}</td><td>${esc(x.r.nama_satker||'—')}</td><td>${esc(displayStatus(x.r.status))}</td><td>${x.parts}/3</td><td>${x.high}</td><td>${x.med}</td><td>${i===0?'Relatif lebih baik':i===comparison.length-1?'Relatif perlu diperhatikan':'Relatif menengah'}</td></tr>`).join('')}</table>`:'';
   return `<!doctype html><html><head><meta charset="utf-8"><title>${esc(title)}</title><style>
   body{font-family:Arial,sans-serif;margin:34px;color:#173b69;line-height:1.45}h1{font-size:24px;margin-bottom:6px}h2{font-size:18px;margin-top:26px;border-bottom:2px solid #d5e0ea;padding-bottom:7px}h3{font-size:14px;margin:17px 0 7px}table{border-collapse:collapse;width:100%;margin:7px 0 14px}td,th{border:1px solid #b9c6d3;padding:7px;text-align:left;vertical-align:top}th{background:#eef4fa}.meta{font-size:12px;color:#526b88;margin-bottom:12px}.small{font-size:11px;color:#667085}.analysis-box{border:1px solid #ccd6e0;border-radius:6px;padding:10px;margin:8px 0;break-inside:avoid}.satker{break-after:page}@media print{button{display:none!important}body{margin:15mm}}</style></head><body>
   <h1>Sistem Monitoring Pelaksanaan Informasi &amp; Edukasi Tahun Anggaran 2026</h1>
@@ -1157,7 +1150,7 @@ function wordReportForIds(ids){
   const records=(data?.records||[]).filter(r=>ids.includes(String(r.pengisian_id)));
   const items=(analyses||[]).filter(a=>ids.includes(String(a.pengisian_id)));
   if(!records.length){alert('Pilih minimal satu Satker yang memiliki data monitoring.');return null}
-  const comparison=[];
+  const comparison=comparisonForSelected(ids);
   const title=records.length===1?`Laporan Analisis dan Rekomendasi — ${records[0].nama_satker}`:`Laporan Analisis dan Rekomendasi — ${records.length} Satker`;
   return makeReportHtml(records,items,title,comparison);
 }
@@ -1270,178 +1263,3 @@ async function loadGIS(){
     console.warn('[Evaluasi Dit IE] GIS refresh gagal',e);
   }
 }
-/* ============================================================
-   MONEV IE 2026 FINAL INTEGRATION
-   Evidence → AI narrative → Hierarchical Report
-   ============================================================ */
-(function(){
-'use strict';
-
-function monevSafeNumber(v){
-  if(v===null||v===undefined||String(v).trim()==='') return null;
-  if(typeof v==='number') return Number.isFinite(v)?v:null;
-  let s=String(v).trim().replace(/[^0-9,.\-]/g,'');
-  if(!s)return null;
-  const c=s.lastIndexOf(','), d=s.lastIndexOf('.');
-  if(c>=0&&d>=0){ s=c>d?s.replace(/\./g,'').replace(',','.'):s.replace(/,/g,''); }
-  else if(c>=0){ const p=s.split(','); s=(p.length===2&&p[1].length<=2)?s.replace(',','.'):s.replace(/,/g,''); }
-  else if(d>=0){ const p=s.split('.'); if(p.length>2|| (p.length===2&&p[1].length===3))s=s.replace(/\./g,''); }
-  const n=Number(s); return Number.isFinite(n)?n:null;
-}
-function monevSafePct(a,b){
-  a=monevSafeNumber(a);b=monevSafeNumber(b);
-  return a===null||b===null||b===0?null:(a/b)*100;
-}
-function monevPctText(v){
-  return Number.isFinite(v)?v.toFixed(1)+'%':'BELUM DAPAT DIHITUNG';
-}
-function monevEvidenceForRecord(r){
-  const aa=typeof finalAnalysesForRecord==='function'?finalAnalysesForRecord(r):[];
-  return {
-    schema:'MONEV-IE-2026-EVIDENCE-1.0',
-    level:'SATKER',
-    identity:{
-      pengisian_id:r?.pengisian_id||null,
-      nomor_pengisian:r?.nomor_pengisian||null,
-      kode_satker:r?.kode_satker||null,
-      nama_satker:r?.nama_satker||null,
-      provinsi:r?.provinsi||null,
-      status_pengisian:r?.status||null
-    },
-    sections:aa.map(x=>({
-      fokus:x.fokus||null,
-      indikator:x.indikator||x.kode_indikator||null,
-      nilai_aktual:x.nilai_aktual??x.nilai??null,
-      target:x.target??null,
-      gap:x.gap??null,
-      capaian:Number.isFinite(Number(x.capaian))?Number(x.capaian):null,
-      capaian_tampil:Number.isFinite(Number(x.capaian))?monevPctText(Number(x.capaian)):'BELUM DAPAT DIHITUNG',
-      status:x.status||null,
-      temuan:x.temuan||x.temuan_kandidat||null,
-      prioritas:x.prioritas||x.priority||null,
-      dasar:x.dasar_juknis||x.basis||null
-    })),
-    rule:'AI hanya menyusun narasi dari evidence; AI tidak menghitung, membuat target/indikator, mengubah status, membuat skor, atau ranking.'
-  };
-}
-function monevAggregateEvidence(records){
-  records=records||[];
-  const status={};
-  const prov={};
-  records.forEach(r=>{
-    const s=String(r.status||'BELUM MENGISI').toUpperCase();
-    status[s]=(status[s]||0)+1;
-    const p=r.provinsi||r.wilayah||r.gis?.provinsi||'Tidak teridentifikasi';
-    if(!prov[p])prov[p]={provinsi:p,total:0,sudah_mengisi:0,belum_selesai:0,belum_mengisi:0};
-    prov[p].total++;
-    if(s==='SELESAI')prov[p].sudah_mengisi++;
-    else if(s==='DRAFT')prov[p].belum_selesai++;
-    else prov[p].belum_mengisi++;
-  });
-  return {
-    schema:'MONEV-IE-2026-EVIDENCE-1.0',
-    level:'NASIONAL',
-    population:{totalSatker:216,recordsLoaded:records.length,status},
-    provinsi:Object.values(prov),
-    satker:records.map(monevEvidenceForRecord)
-  };
-}
-function monevNarrative(e,level){
-  const id=e?.identity?.nama_satker||'Satker';
-  const sections=e?.sections||[];
-  if(!sections.length)return {
-    analisis:`Data monitoring ${id} belum menyediakan evidence evaluasi yang cukup untuk menyusun analisis kuantitatif.`,
-    temuan:'Belum tersedia evidence evaluasi yang memadai.',
-    rekomendasi:'Lengkapi data monitoring dan bukti pelaksanaan yang diperlukan agar telaah dapat dilakukan secara objektif.',
-    tindak_lanjut:'Verifikasi kembali data yang belum tersedia pada periode monitoring berikutnya.'
-  };
-  const attention=sections.filter(x=>['TINGGI','ATENSI'].includes(String(x.prioritas||'').toUpperCase()));
-  const support=sections.filter(x=>['SEDANG','PENDAMPINGAN','MONITORING'].includes(String(x.prioritas||'').toUpperCase()));
-  const undetermined=sections.filter(x=>x.capaian_tampil==='BELUM DAPAT DIHITUNG');
-  const parts=[];
-  parts.push(`Berdasarkan evidence hasil monitoring yang telah dihitung oleh sistem, telaah terhadap ${id} menunjukkan ${sections.length} temuan/aspek yang dapat dibaca.`);
-  if(attention.length)parts.push(`Terdapat ${attention.length} aspek yang ditandai untuk perhatian berdasarkan prioritas mesin.`);
-  if(support.length)parts.push(`Terdapat ${support.length} aspek yang memerlukan penguatan atau pendampingan berdasarkan hasil telaah.`);
-  if(undetermined.length)parts.push(`${undetermined.length} aspek belum dapat dihitung capaiannya karena evidence atau denominator yang diperlukan belum memadai.`);
-  return {
-    analisis:parts.join(' '),
-    temuan:attention.length?attention.map(x=>x.temuan||x.fokus).filter(Boolean).slice(0,5).join('; '):'Tidak ada temuan prioritas tinggi yang tersedia dalam evidence.',
-    rekomendasi:attention.length
-      ?`Tindak lanjut diarahkan pada aspek yang telah ditandai prioritas dalam evidence, dengan tetap mempertahankan capaian pada aspek yang sudah memenuhi.`
-      :`Pertahankan pelaksanaan yang sudah tercatat dan lengkapi evidence pada aspek yang belum dapat dinilai.`,
-    tindak_lanjut:'Lakukan verifikasi terhadap tindak lanjut berdasarkan indikator dan evidence yang sama pada monitoring berikutnya.'
-  };
-}
-window.MonevFinalEngine={
-  safeNumber:monevSafeNumber,
-  safePct:monevSafePct,
-  pctText:monevPctText,
-  evidenceForRecord:monevEvidenceForRecord,
-  aggregateEvidence:monevAggregateEvidence,
-  narrative:monevNarrative
-};
-
-/* ---------- Hierarchical report UI ---------- */
-function reportDataset(){
-  const records=(data?.records||[]);
-  return {
-    totalSatker:216,
-    records,
-    submitted:records.filter(r=>String(r.status||'').toUpperCase()==='SELESAI').length,
-    draft:records.filter(r=>String(r.status||'').toUpperCase()==='DRAFT').length
-  };
-}
-function finalReportHtml(level){
-  const ds=reportDataset();
-  const records=ds.records;
-  const title=level==='NATIONAL'
-    ?'Laporan Monitoring Pelaksanaan Informasi & Edukasi Tahun Anggaran 2026 — Direktorat/Nasional'
-    :level==='BNNP'
-      ?'Laporan Monitoring Pelaksanaan Informasi & Edukasi Tahun Anggaran 2026 — Rekap BNNP/Provinsi'
-      :'Laporan Monitoring Pelaksanaan Informasi & Edukasi Tahun Anggaran 2026 — Satker';
-  let body='';
-  if(level==='SATKER'){
-    body=records.map(r=>{
-      const ev=monevEvidenceForRecord(r), n=monevNarrative(ev,'SATKER');
-      return `<section class="satker"><h2>${esc(r.nama_satker||'Satker')}</h2>
-      <p><b>Kode Satker:</b> ${esc(r.kode_satker||'—')} &nbsp; <b>Status:</b> ${esc(displayStatus(r.status))}</p>
-      <h3>Analisis</h3><p>${esc(n.analisis)}</p>
-      <h3>Temuan</h3><p>${esc(n.temuan)}</p>
-      <h3>Rekomendasi</h3><p>${esc(n.rekomendasi)}</p>
-      <h3>Tindak Lanjut</h3><p>${esc(n.tindak_lanjut)}</p>
-      <h3>Evidence Evaluasi</h3><table><tr><th>Fokus</th><th>Nilai</th><th>Target</th><th>Gap</th><th>Capaian</th><th>Status</th></tr>
-      ${ev.sections.map(x=>`<tr><td>${esc(x.fokus||'—')}</td><td>${esc(x.nilai_aktual??'—')}</td><td>${esc(x.target??'—')}</td><td>${esc(x.gap??'—')}</td><td>${esc(x.capaian_tampil)}</td><td>${esc(x.status||'—')}</td></tr>`).join('')}</table></section>`;
-    }).join('');
-  }else{
-    const prov={};
-    records.forEach(r=>{
-      const p=r.provinsi||r.wilayah||r.gis?.provinsi||'Tidak teridentifikasi';
-      if(!prov[p])prov[p]=[];prov[p].push(r);
-    });
-    const groups=Object.entries(prov);
-    body=groups.map(([p,rs])=>`<section class="satker"><h2>${esc(p)}</h2>
-      <table><tr><th>Satker</th><th>Status</th><th>Bagian tersedia</th></tr>
-      ${rs.map(r=>`<tr><td>${esc(r.nama_satker||'—')}</td><td>${esc(displayStatus(r.status))}</td><td>${[r.saved?.A,r.saved?.B,r.saved?.C].filter(Boolean).length}/3</td></tr>`).join('')}</table>
-      <h3>Analisis Wilayah</h3><p>${esc(`Wilayah ${p} memiliki ${rs.length} Satker yang tercatat dalam data monitoring yang dimuat. Uraian wilayah disusun dari kondisi data yang tersedia tanpa membuat ranking atau skor baru.`)}</p>
-      <h3>Rekomendasi</h3><p>${esc('Tindak lanjut wilayah diarahkan pada Satker dan aspek yang secara eksplisit tercatat memerlukan perhatian, penguatan, atau pelengkapan evidence.')}</p>
-      </section>`).join('');
-    if(level==='NATIONAL'){
-      body=`<section><h2>Executive Summary</h2>
-      <p>Populasi monitoring yang menjadi basis sistem adalah 216 Satker. Pada saat laporan dibuat, data yang berhasil dimuat berjumlah ${records.length} pengisian. Status pengisian dibedakan antara sudah mengisi, belum selesai, dan belum mengisi sesuai data sumber.</p>
-      <p>Analisis nasional hanya menggunakan evidence yang telah dihitung mesin. Sistem tidak membuat skor, ranking, indikator, target, atau kesimpulan baru di luar data dan dasar yang tersedia.</p></section>`+body;
-    }
-  }
-  return `<!doctype html><html><head><meta charset="utf-8"><title>${esc(title)}</title>
-  <style>body{font-family:Arial,sans-serif;margin:30px;color:#173b69;line-height:1.5}h1{font-size:23px}h2{margin-top:26px;border-bottom:2px solid #d7e3ee;padding-bottom:6px}h3{font-size:14px;margin-top:18px}table{border-collapse:collapse;width:100%;margin:8px 0 16px}th,td{border:1px solid #b9c6d3;padding:7px;text-align:left;vertical-align:top}th{background:#eef4fa}.small{font-size:11px;color:#607b9d}.satker{page-break-after:always}@media print{body{margin:15mm}}</style></head><body>
-  <h1>${esc(title)}</h1><p class="small">Dibangun dari data monitoring yang tersedia dan evidence evaluasi mesin.</p>${body}
-  <p class="small">Dokumen ini tidak membuat indikator, target, skor, ranking, atau formula baru.</p></body></html>`;
-}
-function openFinalReport(level,print){
-  const h=finalReportHtml(level);
-  if(print){printReport(h);return;}
-  const w=window.open('','_blank');
-  if(!w){alert('Pop-up diblokir browser. Izinkan pop-up untuk membuka laporan.');return;}
-  w.document.open();w.document.write(h);w.document.close();
-}
-window.MonevFinalReports={html:finalReportHtml,open:openFinalReport};
-})();

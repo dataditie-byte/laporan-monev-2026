@@ -1,18 +1,25 @@
 {
-  "package": "MONEV_IE_2026_FINAL_FULL",
-  "files": [
-    "README_UPLOAD.txt",
-    "ai_analysis_engine.js",
-    "app_final.js",
-    "evaluasi.html",
-    "index.html"
+  "name": "MONEV IE 2026 FINAL PIMPINAN",
+  "version": "FINAL-PIMPINAN-1.0",
+  "scope": "Monitoring + GIS + Analysis + Recommendation + Leadership Report",
+  "form_satker_in_portal": false,
+  "backend_changed": false,
+  "ranking": false,
+  "score": false,
+  "reports": [
+    "Nasional",
+    "BNNP/Provinsi"
   ],
-  "production_backend_unchanged": true,
-  "form_satker_unchanged": true,
-  "ai_provider_configured": false,
-  "baseline_source": [
-    "app_final(3).js",
-    "evaluasi(3).html",
-    "index(4).html"
+  "print": [
+    "Browser Print/PDF",
+    "DOCX"
+  ],
+  "files": [
+    "index.html",
+    "evaluasi.html",
+    "app_final.js",
+    "laporan_pimpinan.js",
+    "ai_analysis_engine.js",
+    "README_UPLOAD.txt"
   ]
 }

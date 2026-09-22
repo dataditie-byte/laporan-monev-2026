@@ -1,0 +1,16 @@
+{
+  "name": "Sistem Monitoring Pelaksanaan Informasi & Edukasi 2026",
+  "short_name": "Monitoring IE 2026",
+  "description": "Sistem Monitoring Pelaksanaan Informasi & Edukasi Direktorat Informasi & Edukasi BNN Tahun Anggaran 2026.",
+  "lang": "id-ID",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f4f8fc",
+  "theme_color": "#0b376a",
+  "icons": [
+    {"src":"assets/icons/icon-192.png","sizes":"192x192","type":"image/png","purpose":"any maskable"},
+    {"src":"assets/icons/icon-512.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}
+  ]
+}

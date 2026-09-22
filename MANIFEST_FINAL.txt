@@ -1,0 +1,12 @@
+MONEV IE 2026 — LAPORAN FINAL + AI EVIDENCE LAYER
+==================================================
+Baseline application : app_final.js
+Report helper         : report_engine_final.js
+AI evidence engine    : ai_analysis_engine.js
+AI integration guide  : AI_INTEGRATION_FINAL.md
+Report specification  : REPORT_ENGINE_FINAL.md
+README                : README_LAPORAN_MONEV_IE_2026_FINAL.md
+
+AI does not calculate or invent Monev values. It receives machine-generated evidence.
+No API key/provider is hard-coded.
+Form Satker and Code.gs are not modified by this package.

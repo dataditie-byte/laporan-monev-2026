@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="app-version" content="Sistem Monitoring IE 2026 V1.0.7">
+<meta name="theme-color" content="#0b376a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Monitoring IE 2026">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<title>Sistem Monitoring Pelaksanaan Informasi &amp; Edukasi Tahun Anggaran 2026</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+:root{--blue:#0877d1;--blue2:#1265ad;--navy:#0a376a;--bg:#f4f8fc;--line:#dce9f5;--text:#173b69;--muted:#607b9d;--ok:#078b62;--warn:#a96d00;--danger:#b42318}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif}
+header{background:#fff;border-bottom:1px solid var(--line)}.head{max-width:1240px;margin:auto;padding:17px 24px;display:flex;align-items:center;justify-content:space-between}.brand{display:flex;gap:15px;align-items:center}.brand img{width:62px;height:62px;object-fit:contain}.brand h1{margin:0;font-size:23px;color:#0b3973}.brand p{margin:4px 0 0;font-weight:700;color:#315a86}.ab{width:66px;height:66px;object-fit:contain}
+.hero{background:linear-gradient(100deg,#075aa9,#2d83c7);color:#fff}.hero-inner{max-width:1240px;margin:auto;padding:25px 24px}.hero h2{margin:0;font-size:30px}.hero p{margin:7px 0 0;opacity:.94}
+.wrap{max-width:1240px;margin:22px auto;padding:0 24px}.panel{background:#fff;border:1px solid var(--line);border-radius:16px;padding:19px;margin-bottom:17px;box-shadow:0 7px 20px rgba(27,78,125,.05)}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.input,.select,textarea{border:1px solid #cfe0ef;border-radius:10px;padding:11px 13px;font:inherit;color:var(--text);background:#fff}.input{min-width:260px}.btn{border:0;border-radius:10px;background:var(--blue);color:#fff;padding:11px 17px;font-weight:700;cursor:pointer}.btn.secondary{background:#edf5fc;color:#16558e}.btn.danger{background:#fff0f0;color:var(--danger);border:1px solid #ffd0d0}
+.hidden{display:none!important}.muted{color:var(--muted)}.small{font-size:12px}.error{color:var(--danger)}.success{color:var(--ok)}
+.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}.metric{border:1px solid var(--line);border-radius:14px;padding:16px;background:#fff;cursor:pointer;transition:.15s}.metric:hover{transform:translateY(-1px);box-shadow:0 5px 15px rgba(27,78,125,.08)}.metric .n{font-size:29px;font-weight:800;color:var(--blue)}.metric .l{margin-top:4px;color:var(--muted);font-weight:700}.metric.active{outline:2px solid #a9d3f5}
+#map{height:500px;border-radius:13px;border:1px solid var(--line);overflow:hidden}.gis-placeholder{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:25px;text-align:center;color:#607b9d;line-height:1.7}.gis-placeholder span{font-size:13px}.map-head{display:flex;justify-content:space-between;gap:12px;align-items:end;margin-bottom:12px}.map-head h2{margin:0 0 4px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}.tab{border:1px solid var(--line);background:#fff;padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:700;color:var(--text)}.tab.active{background:#eaf4ff;border-color:#b9daf7;color:#075aa9}
+table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:10px;border-bottom:1px solid #e6eef6;vertical-align:top}th{background:#f5f9fd}.badge{display:inline-block;padding:4px 8px;border-radius:999px;background:#eef4fa;font-size:12px;font-weight:700}.ok{background:#e7f7f1;color:var(--ok)}.warn{background:#fff6dd;color:var(--warn)}.danger{background:#fff0f0;color:var(--danger)}
+.rowbtn{cursor:pointer;color:#075aa9;font-weight:700}.detail{display:none}.detail.show{display:block}.formgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.field label{display:block;font-size:12px;font-weight:700;margin-bottom:5px}.field textarea{width:100%;min-height:90px}.field input,.field select{width:100%}
+.listbox{max-height:390px;overflow:auto}.satrow{padding:12px 6px;border-bottom:1px solid #e6eef6;cursor:pointer}.satrow:hover{background:#f7fbff}.satrow b{display:block}.two{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(260px,.65fr);gap:17px}.footer{background:#0b376a;color:#fff;padding:18px}.footer-inner{max-width:1240px;margin:auto;display:flex;gap:12px;align-items:center}.footer-logo{width:38px;height:38px;object-fit:contain}
+@media(max-width:950px){.grid{grid-template-columns:repeat(2,1fr)}.two{grid-template-columns:1fr}.formgrid{grid-template-columns:1fr}}@media(max-width:600px){.grid{grid-template-columns:1fr}.wrap{padding:0 12px}.head{padding:12px}.hero-inner{padding:20px 12px}.brand h1{font-size:18px}.brand img{width:48px;height:48px}.ab{width:52px;height:52px}#map{height:380px}}
+
+.data-section{margin-top:12px;box-shadow:none;background:#fbfdff}
+.data-section h3{margin-top:0;color:#173b69}
+.detail-intro{display:flex;flex-direction:column;gap:3px;padding:12px 14px;background:#eef6fd;border-left:4px solid #1477c9;border-radius:8px;margin-bottom:12px}
+.detail-intro span{font-size:13px;color:#607b9d}
+.history-card{box-shadow:none;background:#fbfdff}
+.history-head{display:flex;justify-content:space-between;gap:10px;align-items:center}.action-group{display:flex;gap:6px;flex-wrap:wrap}.action-group .btn{padding:8px 11px;font-size:12px}.actionDelete{color:#a51f1f}
+
+.analysis-intro{background:#f4f8fc;border:1px solid #d8e4ef;border-radius:10px;padding:15px;margin-bottom:12px}
+.analysis-basis{margin-top:10px;padding:10px 12px;background:#fff;border-left:4px solid #1477c9;border-radius:6px;font-size:13px}
+.analysis-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0}
+.analysis-card{padding:12px;border:1px solid #d8e4ef;border-radius:9px;background:#fff}
+.analysis-card b{display:block;font-size:22px;color:#173b69}.analysis-card span{font-size:12px;color:#607b9d}
+.analysis-list{display:grid;gap:12px}
+.analysis-item{border:1px solid #d8e4ef;border-radius:10px;padding:14px;background:#fff}
+.analysis-item-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.analysis-item h4{margin:0 0 4px;color:#173b69}.analysis-item p{margin:7px 0;line-height:1.5}
+.analysis-item .recommendation{background:#f7fafc;border-left:4px solid #1477c9;padding:9px 11px;border-radius:5px}
+.status-section{margin:17px 0}.status-section h2{margin:0 0 5px}.status-section p{margin:0 0 10px}.status-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.status-card{border:1px solid var(--line);border-radius:14px;padding:17px;background:#fff;cursor:pointer;transition:.15s}.status-card:hover{transform:translateY(-1px);box-shadow:0 5px 15px rgba(27,78,125,.08)}.status-card.active{outline:2px solid #a9d3f5}.status-card .status-n{font-size:31px;font-weight:800}.status-card .status-l{font-weight:800;margin-top:3px}.status-card .status-h{font-size:11px;margin-top:5px;color:var(--muted)}.status-ok{background:#e7f7f1!important;color:var(--ok)!important}.status-strengthen{background:#fff6dd!important;color:var(--warn)!important}.status-attention{background:#fff0f0!important;color:var(--danger)!important}.status-pill{display:inline-block;padding:7px 10px;border-radius:999px;font-size:12px;font-weight:800}.analysis-section-title{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.attention-box{margin-top:14px;padding:13px 15px;border-left:4px solid var(--danger);background:#fff8f7;border-radius:7px}.attention-box p{margin:6px 0 0;line-height:1.5}.report-bottom{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:18px;padding:14px;background:#f4f8fc;border:1px solid var(--line);border-radius:10px}.report-bottom span{display:block;font-size:12px;color:var(--muted);margin-top:3px}
+@media(max-width:700px){.analysis-cards{grid-template-columns:1fr}.status-grid{grid-template-columns:1fr}.report-bottom{flex-direction:column;align-items:stretch}}
+
+.compare-toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:12px 0}.compare-toolbar .input{flex:1;min-width:220px}
+.analysis-select{max-height:230px;overflow:auto;border:1px solid #d8e4ef;border-radius:9px;background:#fff}.analysis-select-row{display:flex;align-items:center;gap:9px;padding:9px 11px;border-bottom:1px solid #edf2f7}.analysis-select-row:last-child{border-bottom:0}.analysis-select-row input{width:17px;height:17px}.analysis-select-row .satname{font-weight:700;color:#173b69}.analysis-select-row .satmeta{font-size:11px;color:#607b9d}
+.analysis-compare{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:12px}@media(max-width:700px){.analysis-compare{grid-template-columns:1fr}}
+
+.detail-note{margin:14px 0;padding:10px 12px;border-left:4px solid #0b75d1;background:#f5f9fd;border-radius:6px;color:#486786;font-size:13px}
+.comparison-head{margin-top:14px}.comparison-head h3{margin:0 0 4px}.comparison-table-wrap{overflow:auto;margin-top:8px}.comparison-table{width:100%;border-collapse:collapse;min-width:760px;background:#fff}.comparison-table th,.comparison-table td{padding:9px 10px;border-bottom:1px solid #e3ebf3;text-align:left}.comparison-table th{background:#f3f7fb;color:#173b69;font-size:12px}.comparison-table td{font-size:13px}
+
+.history-count{border:0;background:#fff4d6;color:#9a6200;border-radius:999px;padding:5px 10px;font-weight:700;cursor:pointer}
+.history-modal{display:none;position:fixed;inset:0;z-index:9999}
+.history-modal.show{display:block}
+.history-backdrop{position:absolute;inset:0;background:rgba(10,32,55,.45)}
+.history-dialog{position:relative;width:min(760px,calc(100% - 28px));max-height:calc(100vh - 40px);overflow:auto;margin:20px auto;background:#fff;border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.25);padding:18px}
+.history-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;border-bottom:1px solid #e3ebf3;padding-bottom:12px}
+.history-note{margin:12px 0;padding:10px 12px;border-left:4px solid #0b75d1;background:#f5f9fd;color:#486786;font-size:12px;border-radius:6px}
+.history-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 4px;border-bottom:1px solid #edf2f7}
+.history-main{display:flex;gap:8px;align-items:center}
+.history-tag{font-size:11px;padding:3px 7px;border-radius:999px;background:#eaf3ff;color:#1769aa}
+@media(max-width:700px){.history-dialog{margin:10px auto;max-height:calc(100vh - 20px)}.history-row{align-items:flex-start;flex-direction:column}.history-open{width:100%}}
+</style>
+</head>
+<body>
+<header><div class="head">
+<div class="brand"><img src="assets/logo-bnn.webp" onerror="this.style.display='none'"><div><h1>DEPUTI BIDANG PENCEGAHAN</h1><p>Direktorat Informasi &amp; Edukasi BNN</p></div></div>
+<img class="ab" src="assets/ananda-bersinar.webp" onerror="this.style.display='none'">
+</div></header>
+<section class="hero"><div class="hero-inner"><h2>Sistem Monitoring Pelaksanaan Informasi &amp; Edukasi Tahun Anggaran 2026</h2><p>Peta Monitoring · Analisis · Temuan · Rekomendasi · Tindak Lanjut</p></div></section>
+
+<main class="wrap">
+<section id="accessPanel" class="panel">
+<h2 style="margin:0 0 7px">Akses Evaluasi Dit IE</h2><p class="muted">Gunakan halaman ini untuk menelaah data, menetapkan acuan penilaian, dan melakukan evaluasi Satker.</p>
+<div class="toolbar"><input id="key" class="input" type="password" placeholder="Kunci akses"><button id="openBtn" class="btn">Buka Evaluasi</button></div>
+<div id="accessMsg" class="small" style="margin-top:9px"></div>
+</section>
+
+<section id="app" class="hidden">
+<div class="panel">
+<div id="dashboardMsg" class="muted small" style="margin-bottom:8px">Siap menampilkan data monitoring.</div>
+<div class="toolbar" style="justify-content:space-between"><div><h2 style="margin:0 0 4px">Peta Monitoring Satker</h2><div class="muted small">Pilih titik Satker untuk melihat kondisi monitoring dan membuka evaluasi.</div></div><div class="action-group"><button id="reload" class="btn secondary">Muat Ulang</button><button id="logout" class="btn secondary">Keluar</button></div></div>
+</div>
+
+<div id="metrics" class="grid"></div>
+
+<div class="status-section"><h2>Status Evaluasi Satker</h2><p class="muted small">Status ini menjadi ringkasan utama untuk menentukan prioritas perhatian pimpinan.</p><div id="statusMetrics" class="status-grid"></div></div>
+
+<div class="two">
+<section class="panel">
+<div class="map-head"><div><h2>Peta GIS Satker</h2><div id="gisMsg" class="muted small">Peta otomatis dimuat dari baseline 216 Satker.</div></div></div>
+<div id="map"></div>
+</section>
+<section class="panel">
+<h2 style="margin:0 0 5px">Daftar Satker</h2>
+<div id="listHint" class="muted small" style="margin-bottom:10px">Pilih status, cari Satker, atau klik titik pada peta untuk melihat detail.</div>
+<div class="toolbar" style="margin-bottom:10px"><input id="search" class="input" placeholder="Cari nama Satker, kode, atau nomor pengisian"><select id="statusFilter" class="select"><option value="">Semua status</option><option value="SELESAI">Sudah Mengisi</option><option value="DRAFT">Belum Selesai</option><option value="PERLU_MENGISI">Belum Mengisi</option><option value="PERLU_PENDAMPINGAN">PERLU PENDAMPINGAN</option><option value="PERLU_PERHATIAN">PERLU PERHATIAN</option></select></div>
+<div class="listbox" id="satkerList"></div>
+</section>
+</div>
+
+<section class="panel">
+<div class="tabs"><button class="tab active" data-tab="monitoring">Monitoring</button><button class="tab" data-tab="analisis">Analisis & Rekomendasi</button></div>
+<div id="tab-monitoring"><p class="muted small">Data monitoring Satker berasal dari pengisian Satker dan ditampilkan sebagai sumber evaluasi. Data sumber tidak diubah atau dihapus dari halaman ini.</p><div style="overflow:auto"><table><thead><tr><th>Satker</th><th>Input</th><th>Status</th><th>Bagian Umum</th><th>Bagian RTS</th><th>Bagian Penyebaran Informasi &amp; Edukasi</th><th>Aksi</th></tr></thead><tbody id="satkerBody"></tbody></table></div></div>
+
+<div id="tab-analisis" class="hidden">
+  <div class="analysis-intro">
+    <h3 style="margin:0 0 5px">Analisis &amp; Rekomendasi Beberapa Satker</h3>
+    <p class="muted small">Pilih beberapa Satker untuk membandingkan kondisi, kesenjangan, dasar Juknis, dan rekomendasi. Analisis tetap berbasis data monitoring yang tersedia.</p>
+    <div class="analysis-basis"><b>Dasar analisis:</b> Juknis RTS dan Juknis Penyebarluasan Informasi dan Edukasi. Sistem tidak membuat target atau kesimpulan tanpa data pendukung.</div>
+  </div>
+  <div class="compare-toolbar">
+    <input id="analysisSearch" class="input" placeholder="Cari Satker untuk dianalisis">
+    <button id="selectAllAnalysis" class="btn secondary">Pilih Semua Satker</button>
+    <button id="clearAllAnalysis" class="btn secondary">Bersihkan Pilihan</button><span id="analysisSelectedCount" class="small muted">0 Satker dipilih</span>
+  </div>
+  <div id="analysisSatkerSelect" class="analysis-select"></div>
+  <div class="toolbar" style="margin:12px 0"><button id="runAnalysis" class="btn">Analisis &amp; Rekomendasi Satker Terpilih</button><button id="multiWord" class="btn secondary">Laporan Word</button><button id="multiPrint" class="btn secondary">Cetak Laporan</button><span id="analysisMsg" class="small muted"></span></div>
+  <div id="analysisComparison"></div><div id="analysisSummaryCards" class="analysis-cards"></div>
+  <div id="analysisList" class="analysis-list"></div>
+</div>
+
+
+<section id="detailPanel" class="panel detail">
+<div class="toolbar" style="justify-content:space-between"><div><h2 id="detailTitle" style="margin:0 0 4px"></h2><div id="detailMeta" class="muted"></div></div><div style="display:flex;gap:8px;align-items:center"><button id="detailWord" class="btn">📄 Laporan Word</button><button id="closeDetail" class="btn secondary">Tutup</button></div></div>
+<div id="detailData" style="margin-top:15px"></div>
+<div class="detail-note">Analisis dan rekomendasi pada Satker ini disusun dari data monitoring yang tersedia dan ketentuan Juknis.</div>
+</section>
+</section>
+</main>
+<footer class="footer"><div class="footer-inner"><img class="footer-logo" src="assets/logo-bnn.webp"><div><strong>Direktorat Informasi &amp; Edukasi BNN</strong><br>Monitoring IE 2026</div></div></footer>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="app_final.js?v=1.0.7"></script>
+<script>if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(e=>console.warn("PWA service worker:",e)));}</script>
+</body>
+</html>

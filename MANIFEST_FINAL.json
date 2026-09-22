@@ -1,0 +1,18 @@
+{
+  "package": "MONEV_IE_2026_FINAL_FULL",
+  "files": [
+    "README_UPLOAD.txt",
+    "ai_analysis_engine.js",
+    "app_final.js",
+    "evaluasi.html",
+    "index.html"
+  ],
+  "production_backend_unchanged": true,
+  "form_satker_unchanged": true,
+  "ai_provider_configured": false,
+  "baseline_source": [
+    "app_final(3).js",
+    "evaluasi(3).html",
+    "index(4).html"
+  ]
+}
